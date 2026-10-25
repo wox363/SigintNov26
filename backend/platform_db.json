@@ -1,0 +1,863 @@
+{
+  "crypto": {
+    "KuCoin": {
+      "ips": [
+        "23.227.38.65"
+      ],
+      "domains": [
+        "kucoin.com"
+      ]
+    },
+    "Binance": {
+      "ips": [
+        "205.251."
+      ],
+      "domains": [
+        "binance.com",
+        "binance.org"
+      ]
+    },
+    "CoinBase": {
+      "ips": [
+        "104.18.6.",
+        "104.18.7."
+      ],
+      "domains": [
+        "coinbase.com"
+      ]
+    },
+    "CoinDCX": {
+      "ips": [],
+      "domains": [
+        "coindcx.com"
+      ]
+    },
+    "WazirX": {
+      "ips": [],
+      "domains": [
+        "wazirx.com"
+      ]
+    },
+    "Kraken": {
+      "ips": [],
+      "domains": [
+        "kraken.com"
+      ]
+    },
+    "Bybit": {
+      "ips": [],
+      "domains": [
+        "bybit.com"
+      ]
+    },
+    "Unocoin": {
+      "ips": [],
+      "domains": [
+        "unocoin.com"
+      ]
+    },
+    "CoinSwitch": {
+      "ips": [],
+      "domains": [
+        "coinswitch.co"
+      ]
+    },
+    "ZebPay": {
+      "ips": [],
+      "domains": [
+        "zebpay.com"
+      ]
+    },
+    "Giottus": {
+      "ips": [],
+      "domains": [
+        "giottus.com"
+      ]
+    }
+  },
+  "messaging": {
+    "Signal": {
+      "ips": [
+        "23.227.38.74",
+        "76.223.",
+        "99.83.",
+        "2620:127:F00F:E::"
+      ],
+      "domains": [
+        "signal.org",
+        "whispersystems"
+      ]
+    },
+    "Silent Phone": {
+      "ips": [
+        "13.225.103.41"
+      ],
+      "domains": [
+        "silentcircle.com",
+        "silent phone"
+      ]
+    },
+    "Telegram": {
+      "ips": [
+        "149.154.",
+        "91.108."
+      ],
+      "domains": [
+        "telegram.org",
+        "t.me"
+      ]
+    },
+    "WhatsApp": {
+      "ips": [
+        "57.144.147.",
+        "157.240."
+      ],
+      "domains": [
+        "whatsapp.com",
+        "whatsapp.net"
+      ]
+    },
+    "Wickr": {
+      "ips": [],
+      "domains": [
+        "wickr.com",
+        "wickr.me"
+      ]
+    },
+    "Threema": {
+      "ips": [],
+      "domains": [
+        "threema.ch"
+      ]
+    },
+    "ICQ New": {
+      "ips": [],
+      "domains": [
+        "icq.com",
+        "icq.net"
+      ]
+    },
+    "Session": {
+      "ips": [],
+      "domains": [
+        "getsession.org"
+      ]
+    },
+    "Briar": {
+      "ips": [],
+      "domains": [
+        "briarproject.org"
+      ]
+    },
+    "Wire": {
+      "ips": [],
+      "domains": [
+        "wire.com"
+      ]
+    },
+    "Element/Matrix": {
+      "ips": [],
+      "domains": [
+        "element.io",
+        "matrix.org"
+      ]
+    },
+    "Dust": {
+      "ips": [],
+      "domains": [
+        "usedust.com"
+      ]
+    },
+    "Viber": {
+      "ips": [
+        "54.225.",
+        "52.5."
+      ],
+      "domains": [
+        "viber.com"
+      ]
+    }
+  },
+  "anonymous_chat": {
+    "Whisper": {
+      "ips": [
+        "18.66.112."
+      ],
+      "domains": [
+        "whisper.sh"
+      ]
+    },
+    "BIGO": {
+      "ips": [
+        "35.167.216."
+      ],
+      "domains": [
+        "bigo.tv",
+        "bigo.sg"
+      ]
+    },
+    "Omegle": {
+      "ips": [],
+      "domains": [
+        "omegle.com"
+      ]
+    },
+    "Chatroulette": {
+      "ips": [],
+      "domains": [
+        "chatroulette.com"
+      ]
+    },
+    "Holla": {
+      "ips": [],
+      "domains": [
+        "holla.world"
+      ]
+    },
+    "MeetMe": {
+      "ips": [],
+      "domains": [
+        "meetme.com"
+      ]
+    },
+    "Azar": {
+      "ips": [],
+      "domains": [
+        "azarlive.com"
+      ]
+    }
+  },
+  "file_transfer": {
+    "SendAnywhere": {
+      "ips": [
+        "18.164.246.",
+        "18.172.112."
+      ],
+      "domains": [
+        "send-anywhere.com",
+        "sendanywhere"
+      ]
+    },
+    "WeTransfer": {
+      "ips": [],
+      "domains": [
+        "wetransfer.com"
+      ]
+    },
+    "Dropbox": {
+      "ips": [
+        "162.125."
+      ],
+      "domains": [
+        "dropbox.com"
+      ]
+    },
+    "GoogleDrive": {
+      "ips": [
+        "142.250.",
+        "172.217."
+      ],
+      "domains": [
+        "drive.google.com",
+        "docs.google.com"
+      ]
+    },
+    "Mega": {
+      "ips": [],
+      "domains": [
+        "mega.nz",
+        "mega.co.nz"
+      ]
+    },
+    "OneDrive": {
+      "ips": [],
+      "domains": [
+        "onedrive.live.com",
+        "1drv.ms"
+      ]
+    },
+    "MediaFire": {
+      "ips": [],
+      "domains": [
+        "mediafire.com"
+      ]
+    },
+    "Xender": {
+      "ips": [],
+      "domains": [
+        "xender.com"
+      ]
+    },
+    "SHAREit": {
+      "ips": [],
+      "domains": [
+        "shareit.com",
+        "ushareit.com"
+      ]
+    },
+    "Zapya": {
+      "ips": [],
+      "domains": [
+        "zapya.com"
+      ]
+    },
+    "Files by Google": {
+      "ips": [],
+      "domains": [
+        "files.google.com"
+      ]
+    }
+  },
+  "social": {
+    "Instagram": {
+      "ips": [
+        "31.13.64."
+      ],
+      "domains": [
+        "instagram.com",
+        "cdninstagram"
+      ]
+    },
+    "Twitter/X": {
+      "ips": [
+        "104.244.",
+        "172.66.0.",
+        "162.159.140."
+      ],
+      "domains": [
+        "twitter.com",
+        "x.com",
+        "twimg"
+      ]
+    },
+    "Snapchat": {
+      "ips": [
+        "35.190.43."
+      ],
+      "domains": [
+        "snapchat.com"
+      ]
+    },
+    "Twitch": {
+      "ips": [
+        "13.225.103.24",
+        "13.225.103.83"
+      ],
+      "domains": [
+        "twitch.tv"
+      ]
+    },
+    "Facebook": {
+      "ips": [
+        "31.13.73.",
+        "31.13.86."
+      ],
+      "domains": [
+        "facebook.com",
+        "fbcdn"
+      ]
+    },
+    "Facebook Messenger": {
+      "ips": [
+        "163.70.145.",
+        "163.70.146."
+      ],
+      "domains": [
+        "messenger.com"
+      ]
+    },
+    "YouTube": {
+      "ips": [],
+      "domains": [
+        "youtube.com",
+        "googlevideo"
+      ]
+    },
+    "TikTok": {
+      "ips": [],
+      "domains": [
+        "tiktok.com",
+        "tiktokv.com"
+      ]
+    },
+    "LinkedIn": {
+      "ips": [
+        "150.171.22.",
+        "150.171."
+      ],
+      "domains": [
+        "linkedin.com"
+      ]
+    },
+    "Mastodon": {
+      "ips": [],
+      "domains": [
+        "mastodon.social",
+        "mastodon"
+      ]
+    },
+    "Reddit": {
+      "ips": [],
+      "domains": [
+        "reddit.com",
+        "redd.it"
+      ]
+    },
+    "Pinterest": {
+      "ips": [],
+      "domains": [
+        "pinterest.com"
+      ]
+    },
+    "Threads": {
+      "ips": [],
+      "domains": [
+        "threads.net"
+      ]
+    },
+    "Koo": {
+      "ips": [],
+      "domains": [
+        "kooapp.com"
+      ]
+    },
+    "ShareChat": {
+      "ips": [],
+      "domains": [
+        "sharechat.com"
+      ]
+    },
+    "Moj": {
+      "ips": [],
+      "domains": [
+        "mojapp.in"
+      ]
+    },
+    "Discord": {
+      "ips": [],
+      "domains": [
+        "discord.com",
+        "discord.gg",
+        "discordapp"
+      ]
+    },
+    "Clubhouse": {
+      "ips": [],
+      "domains": [
+        "clubhouse.com"
+      ]
+    }
+  },
+  "live_streaming": {
+    "Twitch": {
+      "ips": [
+        "13.225.103.24",
+        "13.225.103.83"
+      ],
+      "domains": [
+        "twitch.tv"
+      ]
+    },
+    "BIGO Live": {
+      "ips": [
+        "35.167.216."
+      ],
+      "domains": [
+        "bigo.tv"
+      ]
+    },
+    "YouTube Live": {
+      "ips": [],
+      "domains": [
+        "youtube.com/live"
+      ]
+    },
+    "Likee": {
+      "ips": [],
+      "domains": [
+        "likee.video",
+        "likee.com"
+      ]
+    },
+    "Chingari": {
+      "ips": [],
+      "domains": [
+        "chingari.io"
+      ]
+    }
+  },
+  "vpn_proxy": {
+    "NordVPN": {
+      "ips": [],
+      "domains": [
+        "nordvpn.com"
+      ]
+    },
+    "ExpressVPN": {
+      "ips": [],
+      "domains": [
+        "expressvpn.com"
+      ]
+    },
+    "ProtonVPN": {
+      "ips": [
+        "185.159."
+      ],
+      "domains": [
+        "protonvpn.com"
+      ]
+    },
+    "Tor": {
+      "ips": [],
+      "domains": [
+        ".onion",
+        "torproject.org"
+      ]
+    },
+    "Surfshark": {
+      "ips": [],
+      "domains": [
+        "surfshark.com"
+      ]
+    },
+    "CyberGhost": {
+      "ips": [],
+      "domains": [
+        "cyberghostvpn.com"
+      ]
+    },
+    "Windscribe": {
+      "ips": [],
+      "domains": [
+        "windscribe.com"
+      ]
+    },
+    "Psiphon": {
+      "ips": [],
+      "domains": [
+        "psiphon.ca",
+        "psiphon3"
+      ]
+    },
+    "Orbot": {
+      "ips": [],
+      "domains": [
+        "guardianproject.info"
+      ]
+    },
+    "Mullvad": {
+      "ips": [],
+      "domains": [
+        "mullvad.net"
+      ]
+    }
+  },
+  "pakistan_isp": {
+    "Pakistan Telecom (PTCL)": {
+      "ips": [
+        "2404:7000:1300::",
+        "202.141."
+      ],
+      "domains": [
+        "ptcl.com.pk"
+      ]
+    },
+    "AIN DICE/Fasttel Broadband": {
+      "ips": [
+        "2400:7360:0:1::"
+      ],
+      "domains": []
+    },
+    "GH-Telecom": {
+      "ips": [
+        "103.111.38."
+      ],
+      "domains": []
+    },
+    "Netpoint IT Pakistan": {
+      "ips": [
+        "103.170.179."
+      ],
+      "domains": []
+    },
+    "Reliance Broadband PK": {
+      "ips": [
+        "103.244.93."
+      ],
+      "domains": []
+    },
+    "Nayatel Pakistan": {
+      "ips": [
+        "119.160."
+      ],
+      "domains": [
+        "nayatel.com"
+      ]
+    },
+    "Wateen Telecom": {
+      "ips": [
+        "203.215."
+      ],
+      "domains": [
+        "wateen.net"
+      ]
+    },
+    "Mobilink/Jazz": {
+      "ips": [],
+      "domains": [
+        "jazz.com.pk"
+      ]
+    },
+    "Telenor PK": {
+      "ips": [],
+      "domains": [
+        "telenor.com.pk"
+      ]
+    }
+  },
+  "banned_chinese_apps": {
+    "TikTok (Banned)": {
+      "ips": [],
+      "domains": [
+        "tiktok.com",
+        "tiktokv.com",
+        "musical.ly"
+      ]
+    },
+    "SHAREit (Banned)": {
+      "ips": [],
+      "domains": [
+        "shareit.com",
+        "ushareit.com"
+      ]
+    },
+    "UC Browser (Banned)": {
+      "ips": [],
+      "domains": [
+        "ucweb.com",
+        "uc.cn"
+      ]
+    },
+    "CamScanner (Banned)": {
+      "ips": [],
+      "domains": [
+        "camscanner.com"
+      ]
+    },
+    "Helo (Banned)": {
+      "ips": [],
+      "domains": [
+        "helo.com"
+      ]
+    },
+    "Likee (Banned)": {
+      "ips": [],
+      "domains": [
+        "likee.video",
+        "likee.com"
+      ]
+    },
+    "VMate (Banned)": {
+      "ips": [],
+      "domains": [
+        "vmate.com"
+      ]
+    },
+    "WeChat (Banned)": {
+      "ips": [],
+      "domains": [
+        "wechat.com",
+        "weixin.qq.com"
+      ]
+    },
+    "Baidu Maps (Banned)": {
+      "ips": [],
+      "domains": [
+        "baidu.com"
+      ]
+    },
+    "Club Factory (Banned)": {
+      "ips": [],
+      "domains": [
+        "clubfactory.com"
+      ]
+    }
+  },
+  "payment_upi": {
+    "Google Pay": {
+      "ips": [],
+      "domains": [
+        "pay.google.com",
+        "gpay"
+      ]
+    },
+    "PhonePe": {
+      "ips": [],
+      "domains": [
+        "phonepe.com"
+      ]
+    },
+    "Paytm": {
+      "ips": [],
+      "domains": [
+        "paytm.com"
+      ]
+    },
+    "Amazon Pay": {
+      "ips": [],
+      "domains": [
+        "pay.amazon.in"
+      ]
+    },
+    "BHIM": {
+      "ips": [],
+      "domains": [
+        "bhimupi.org.in"
+      ]
+    },
+    "MobiKwik": {
+      "ips": [],
+      "domains": [
+        "mobikwik.com"
+      ]
+    },
+    "FreeCharge": {
+      "ips": [],
+      "domains": [
+        "freecharge.in"
+      ]
+    },
+    "PayPal": {
+      "ips": [],
+      "domains": [
+        "paypal.com"
+      ]
+    },
+    "Razorpay": {
+      "ips": [],
+      "domains": [
+        "razorpay.com"
+      ]
+    }
+  },
+  "email": {
+    "ProtonMail": {
+      "ips": [
+        "185.70."
+      ],
+      "domains": [
+        "protonmail.com",
+        "proton.me"
+      ]
+    },
+    "Tutanota": {
+      "ips": [],
+      "domains": [
+        "tutanota.com",
+        "tuta.io"
+      ]
+    },
+    "Gmail": {
+      "ips": [],
+      "domains": [
+        "gmail.com",
+        "googlemail"
+      ]
+    },
+    "Outlook": {
+      "ips": [],
+      "domains": [
+        "outlook.com",
+        "outlook.live"
+      ]
+    },
+    "Yahoo Mail": {
+      "ips": [],
+      "domains": [
+        "yahoo.com",
+        "ymail.com"
+      ]
+    }
+  },
+  "entertainment": {
+    "Netflix": {
+      "ips": [],
+      "domains": [
+        "netflix.com"
+      ]
+    },
+    "Hotstar": {
+      "ips": [],
+      "domains": [
+        "hotstar.com",
+        "disney+hotstar"
+      ]
+    },
+    "Amazon Prime": {
+      "ips": [],
+      "domains": [
+        "primevideo.com"
+      ]
+    },
+    "Spotify": {
+      "ips": [],
+      "domains": [
+        "spotify.com",
+        "scdn.co"
+      ]
+    },
+    "JioSaavn": {
+      "ips": [],
+      "domains": [
+        "jiosaavn.com",
+        "saavn.com"
+      ]
+    },
+    "Gaana": {
+      "ips": [],
+      "domains": [
+        "gaana.com"
+      ]
+    },
+    "SonyLIV": {
+      "ips": [],
+      "domains": [
+        "sonyliv.com"
+      ]
+    },
+    "Zee5": {
+      "ips": [],
+      "domains": [
+        "zee5.com"
+      ]
+    }
+  },
+  "gaming": {
+    "PUBG/BGMI": {
+      "ips": [],
+      "domains": [
+        "pubg.com",
+        "battlegroundsmobileindia"
+      ]
+    },
+    "Free Fire": {
+      "ips": [],
+      "domains": [
+        "ff.garena.com",
+        "freefire"
+      ]
+    },
+    "Call of Duty Mobile": {
+      "ips": [],
+      "domains": [
+        "callofduty.com"
+      ]
+    },
+    "Roblox": {
+      "ips": [],
+      "domains": [
+        "roblox.com"
+      ]
+    }
+  }
+}

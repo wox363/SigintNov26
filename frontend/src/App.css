@@ -1,0 +1,52 @@
+.font-chivo { font-family: 'Chivo', sans-serif; }
+.font-mono { font-family: 'IBM Plex Mono', monospace; }
+.font-body { font-family: 'IBM Plex Sans', sans-serif; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #090A0C; }
+::-webkit-scrollbar-thumb { background: #2D333B; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3D434B; }
+
+/* Risk level colors */
+.risk-critical { color: #E63946; }
+.risk-high { color: #E63946; }
+.risk-medium { color: #F59E0B; }
+.risk-low { color: #10B981; }
+
+.risk-badge-critical { background: rgba(230, 57, 70, 0.15); color: #E63946; border: 1px solid rgba(230, 57, 70, 0.3); }
+.risk-badge-high { background: rgba(230, 57, 70, 0.15); color: #E63946; border: 1px solid rgba(230, 57, 70, 0.3); }
+.risk-badge-medium { background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); }
+.risk-badge-low { background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+/* Category colors */
+.cat-crypto { color: #F59E0B; }
+.cat-messaging { color: #0047FF; }
+.cat-file_transfer { color: #10B981; }
+.cat-social { color: #A78BFA; }
+.cat-vpn_proxy { color: #E63946; }
+.cat-email { color: #8B949E; }
+.cat-anonymous_chat { color: #FF6B6B; }
+.cat-pakistan_isp { color: #E63946; }
+.cat-live_streaming { color: #A78BFA; }
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 71, 255, 0.3); }
+    50% { box-shadow: 0 0 12px 4px rgba(0, 71, 255, 0.15); }
+}
+.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+/* File drop zone */
+.drop-zone { transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out; }
+.drop-zone:hover { border-color: #0047FF; background-color: rgba(0, 71, 255, 0.05); }
+
+/* Table dense */
+.table-dense th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: #6E7681; font-weight: 500; }
+.table-dense td { font-size: 0.8rem; font-family: 'IBM Plex Mono', monospace; }

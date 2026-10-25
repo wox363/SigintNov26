@@ -1,0 +1,37 @@
+{
+  "summary": "Amber_4 soft-delete + undo + reupload + re-analysis banner fully verified. Created pytest suite /app/backend/tests/test_amber4_softdelete.py with 14 tests covering soft-delete flags, recompute counts, needs_reanalysis flag, undo restore (including replaced+purge-new), reupload, edge cases (double-delete 400, undo-of-live 400, 404s, reupload-of-deleted 400), analysis filter excluding is_deleted records + flag clearing on success, and background _undo_window_purger via past timestamp injection. Full regression: 80/80 pass (66 Amber_1/2/3 + 14 Amber_4). Frontend Playwright verified: Overview is default tab, delete shows amber banner + strike-through row with countdown 'Deleted · undo in 2m 59s' + Undo button + Pending deletions badge; reupload toast 'File replaced'; undo after reupload restores old and purges new; banner button data-testid='reanalysis-banner-btn' works.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_amber4_softdelete.py",
+    "/app/test_reports/pytest/amber4_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is 695 lines — approaching the 700-line threshold; consider splitting case/upload/analysis routers into separate modules for maintainability.",
+    "_undo_window_purger ticks every 60s — for a 180s undo window worst-case purge lag is 60s, which is fine; documented in tests with 80s wait.",
+    "_maybe_clear_reanalysis_flag uses ISO-string comparison (last_change <= analysis_at). Works because both are timezone-aware ISO8601 with same offset, but a future code change that drops timezone could break ordering silently. Consider parsing to datetime before comparing.",
+    "Reupload error path (parse failure) raises HTTPException AFTER writing the new temp file but BEFORE soft-deleting old upload — good, old upload is preserved. Verified no rollback needed.",
+    "DELETE /cases/{id} hard-deletes everything including any in-flight soft-deleted uploads — intentional, but worth noting it bypasses the undo window."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_amber4_softdelete.py"
+  ],
+  "success_rate": {
+    "backend": "100% (80/80 pytest)",
+    "frontend": "100% (all 7 UI flows verified)"
+  },
+  "test_credentials": "N/A — no auth in this app",
+  "seed_data_creation": "Each test creates a TEST_Amber4 case + 1 upload via fixture; teardown deletes the case. Existing analyzed case 77aa1a27-... used only for read-only frontend smoke.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Pytest suite under /app/backend/tests/ now has 80 tests across Amber_1/2/3/4. test_amber4_softdelete.py includes a 60-70s background-purger test (TestBackgroundPurger). To run faster, deselect it: pytest --deselect tests/test_amber4_softdelete.py::TestBackgroundPurger. UNDO_WINDOW_SECONDS=180 in server.py is unchanged. Frontend testids in CaseView.js: reanalysis-banner, reanalysis-banner-btn, upload-row-{n}, undo-upload-{n}, reupload-upload-{n}, delete-upload-{n}, countdown-{n}, reupload-hidden-input. Banner remains visible after undo if last analysis is older than the deletion event (by design per _maybe_clear_reanalysis_flag).",
+  "rca of the issue": "No issues found."
+}

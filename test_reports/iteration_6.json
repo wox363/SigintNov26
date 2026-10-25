@@ -1,0 +1,62 @@
+{
+  "test_run_label": "Amber_1",
+  "summary": "Amber_1 — End-to-end testing of 3 new SIGINT analysis modules (SIM/IMSI, Cell Co-Location, Bulk Data Transfer). Backend pytest suite (24 tests) 100% passing; frontend renders all 3 collapsible sections with full data-testid coverage; DOCX/PDF report exports contain new sections and tags; empty-state handling verified against legacy case. All expected sample values from main agent (Pakistan MCC 410 SIM, IMEI 356938035643809 with 3 IMSIs, cell 404-45-12345-1 SIMULTANEOUS event, Safvi alert_count=4, Dropbox 2.88 GB) confirmed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "POST /api/cases/{id}/analyze returns 200 (job kicked off, completes within ~5s)",
+    "GET /api/cases/{id}/analysis returns sim_analysis, cell_colocation, bulk_transfer_analysis at top level",
+    "sim_analysis.has_imsi_data=true; foreign_sims contains Pakistan MCC 410 IMSI 410011234567890 for Safvi",
+    "sim_analysis.sim_swaps contains IMEI 356938035643809 with 3 IMSIs",
+    "sim_analysis.multi_imsi_subjects has Safvi with imsi_count=3",
+    "sim_analysis.per_subject roster contains both Safvi and Chakan",
+    "cell_colocation.has_cell_data=true; total_events=3",
+    "cell_colocation.pair_summary contains Chakan ⇄ Safvi pair",
+    "cell_colocation.events[0].cell_id=404-45-12345-1 with time_diff_seconds=0.0 (SIMULTANEOUS)",
+    "bulk_transfer_analysis.has_volume_data=true; per_subject.Safvi.alert_count=4",
+    "bulk_transfer_analysis.per_subject.Safvi.top_platforms[0] = Dropbox / 2.88 GB",
+    "bulk_transfer_analysis severity tags include ALERT; upload_heavy_sessions populated",
+    "risk_scores.Safvi level=CRITICAL; factors contain 'Foreign SIM', 'bulk transfer ALERT', 'upload-heavy'",
+    "summary.key_findings contains all 4 new signal phrases (high-volume data transfer, cell-tower co-location, foreign-MCC SIM, SIM-swap pattern)",
+    "Empty case 7c958508-... → has_imsi_data=false, has_cell_data=false, no crash",
+    "GET /report/docx returns 200, valid PK zip, word/document.xml contains: 'SIM / IMSI Analysis', 'Cell Tower Co-Location', 'Bulk Data Transfer Alerts', 'PAKISTAN', 'SIM-Swap', 'UPLOAD-HEAVY', 'SIMULTANEOUS'",
+    "GET /report/pdf returns 200, valid %PDF-1.4 magic, extracted text contains all 7 expected needles",
+    "Both report endpoints set Content-Length header and return non-empty streamed body",
+    "Frontend: Sections 12/13/14 render with correct titles, subtitles, and info-tooltip-trigger icons (5 tooltips on page)",
+    "Frontend: SIM section has all 4 alert cards (alert-foreign-sim/sim-swap/multi-imsi/shared-imsi), 1 foreign-sim-row with PAKISTAN badge, 1 sim-swap-row with 3 IMSI chips",
+    "Frontend: Cell section has stat cards (3 events / 1 pair / 4 / 3 unique cells), 1 cell-pair-row, 3 cell-event-card with SIMULTANEOUS/CLOSE badges and mono cell_id labels",
+    "Frontend: Bulk section has 2 bulk-subject-* panels, 5 bulk-platform-row gradient bars, 6 bulk-session-row entries, ALERT/MED badges, UPLOAD-HEAVY callout, 'Dropbox 2.88 GB' visible",
+    "Frontend: Empty case shows graceful empty-state messages 'No IMSI metadata available' and 'No Cell-ID metadata available' without crash",
+    "No browser console / page errors during any UI flow"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_amber1_modules.py",
+    "/app/test_reports/pytest/amber1_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "analysis_engine.py is approaching size threshold — main agent already noted pre-existing E701/F841 lint warnings (not regressions). Consider splitting per-module helpers (_sim_analysis, _cell_colocation, _bulk_transfer_analysis) into a /app/backend/analysis/ subpackage if file exceeds 700 lines.",
+    "Empty/legacy case 7c958508-... still returns has_volume_data=true because byte counts exist on its IPDR rows. This is correct behavior; UI shows the bulk panel with non-zero volumes, so no empty-state is triggered for that subsection. Worth documenting that bulk-transfer empty-state is data-shape-driven (only triggers when zero IPDR sessions), not feature-flag-driven.",
+    "Both DOCX (40 KB) and PDF (9.3 KB) reports stream successfully, but PDF text extraction requires pdfminer; consider documenting expected text extractability for downstream consumers."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_amber1_modules.py (new — 24 pytest cases)"
+  ],
+  "success_rate": {
+    "backend": "100% (24/24 pytest)",
+    "frontend": "100% (all 3 new sections + empty state verified)"
+  },
+  "test_credentials": "N/A (no auth on this app)",
+  "seed_data_creation": "None — used pre-seeded cases 77aa1a27-...669 (happy) and 7c958508-...309b (empty) provided by main agent",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Amber_1 is fully green. Pytest suite at /app/backend/tests/test_amber1_modules.py is the regression baseline for the 3 new modules and report exports. Re-run with: pytest /app/backend/tests/test_amber1_modules.py -v. Frontend section selectors documented: alert-foreign-sim, alert-sim-swap, alert-multi-imsi, alert-shared-imsi, foreign-sim-row, sim-swap-row, cell-pair-row, cell-event-card, bulk-subject-{name}, bulk-platform-row, bulk-session-row, info-tooltip-trigger. Pre-existing lint warnings (E701, F841) in analysis_engine.py confirmed not regressions per main agent note.",
+  "rca_of_the_issue": "N/A — no issues found"
+}

@@ -1,0 +1,109 @@
+{
+  "theme": "DARK",
+  "archetype": "Archetype 4: Swiss & High-Contrast (Tactical Variant)",
+  "design_philosophy": {
+    "core_principles": [
+      "No fluff: 100% functional data density. Every pixel must serve a diagnostic purpose.",
+      "High contrast over soft aesthetics: Sharp borders, stark whites, signal reds.",
+      "Terminal/Control Room Vibe: Data is the hero, UI is the rigid container."
+    ]
+  },
+  "typography": {
+    "fonts": {
+      "headings": "Chivo",
+      "body": "IBM Plex Sans",
+      "monospace": "IBM Plex Mono",
+      "install_command": "Ensure you load Chivo, IBM Plex Sans, and IBM Plex Mono from Google Fonts in index.html."
+    },
+    "hierarchy": {
+      "h1": "text-3xl sm:text-4xl tracking-tight font-bold text-[#E1E7EF]",
+      "h2": "text-xl sm:text-2xl tracking-tight font-semibold text-[#E1E7EF]",
+      "h3": "text-lg font-medium text-[#E1E7EF]",
+      "body": "text-sm leading-relaxed text-[#8B949E]",
+      "overline": "text-xs uppercase tracking-[0.2em] font-medium text-[#6E7681]",
+      "data_points": "text-base font-mono text-[#E1E7EF]"
+    }
+  },
+  "colors": {
+    "background": {
+      "base": "#090A0C",
+      "surface": "#13151A",
+      "surface_hover": "#1C1F26"
+    },
+    "borders": {
+      "default": "#2D333B",
+      "active": "#0047FF",
+      "subtle": "rgba(255, 255, 255, 0.04)"
+    },
+    "text": {
+      "primary": "#E1E7EF",
+      "secondary": "#8B949E",
+      "muted": "#6E7681",
+      "inverse": "#090A0C",
+      "mono": "#A3B3CC"
+    },
+    "brand_accents": {
+      "primary": "#0047FF",
+      "primary_hover": "#003BD6",
+      "risk_high": "#E63946",
+      "risk_medium": "#F59E0B",
+      "risk_low": "#10B981",
+      "highlight": "#FFB000"
+    }
+  },
+  "spacing_and_layout": {
+    "grid_system": "Mode B: The Control Room Grid. Use grid-cols-1 md:grid-cols-3 xl:grid-cols-4 or 12-col dense layouts. gap-4 or gap-6 maximum.",
+    "widget_padding": "p-4 sm:p-5",
+    "border_radius": "rounded-sm (2px to 4px). Prohibited: rounded-2xl, rounded-3xl or full pill shapes.",
+    "alignment": "Strict left-alignment for all data. Center alignment only for empty states or specialized visualizations."
+  },
+  "components": {
+    "surfaces": "bg-[#13151A] border border-[#2D333B] rounded-sm shadow-none. No glassmorphism unless it is a floating modal.",
+    "buttons": {
+      "primary": "bg-[#0047FF] text-white hover:bg-[#003BD6] rounded-sm transition-colors text-sm font-medium px-4 py-2",
+      "danger": "bg-[#E63946] text-white hover:bg-[#D92D39] rounded-sm transition-colors text-sm font-medium px-4 py-2",
+      "outline": "border border-[#2D333B] text-[#E1E7EF] hover:bg-[#1C1F26] rounded-sm transition-colors text-sm font-medium px-4 py-2"
+    },
+    "tables": "High density. text-sm. Thead uses Overline typography styling with uppercase and wide tracking. Tbody must use IBM Plex Mono for IPs, Phone numbers, IMEIs, and Timestamps.",
+    "badges": "Square or very slightly rounded (rounded-sm). High contrast background opacity (e.g. bg-[#E63946]/20) with solid text (text-[#E63946]) and matching border (border border-[#E63946]/30).",
+    "inputs_and_forms": "bg-[#090A0C] border-[#2D333B] focus:border-[#0047FF] focus:ring-1 focus:ring-[#0047FF] text-[#E1E7EF] rounded-sm.",
+    "charts": "Use Recharts with transparent backgrounds, stark grid lines (stroke-[#2D333B] or stroke-white/5), and solid accent colors for data lines/bars without gradients."
+  },
+  "motion": {
+    "philosophy": "Minimalist and immediate. Zero bouncing.",
+    "transitions": "transition-colors duration-150 ease-in-out for hovers and active states."
+  },
+  "icons": {
+    "library": "@phosphor-icons/react",
+    "install_command": "yarn add @phosphor-icons/react",
+    "style": "Duotone or Regular. Strict technical appearance."
+  },
+  "data_visualizations": {
+    "recommended_libraries": [
+      {"name": "recharts", "use_for": "Line charts for Temporal Overlap, Bar charts for Behavioral Profiling, Scatter for correlations."},
+      {"name": "react-force-graph-2d", "use_for": "Interactive Network/Relationship Graph Visualization for Contact Networks (yarn add react-force-graph-2d)."},
+      {"name": "lucide-react", "use_for": "Fallback UI Icons if Phosphor is unavailable."}
+    ]
+  },
+  "media": {
+    "image_urls": {
+      "auth_background": {
+        "url": "https://images.unsplash.com/photo-1585314062604-1a357de8b000?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwyfHxkYXJrJTIwYWJzdHJhY3QlMjB0ZXh0dXJlJTIwZ3JheSUyMGdyYWlufGVufDB8fHx8MTc3NjMwODczOHww&ixlib=rb-4.1.0&q=85",
+        "description": "Dark abstract textile grain, use for login/auth background or empty states. Overlay heavily with bg-[#090A0C]/80."
+      },
+      "agency_logo": {
+        "url": "https://images.unsplash.com/photo-1576607887261-e3ff5018f3ef?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwyfHxwb2xpY2UlMjBiYWRnZSUyMGxvZ28lMjBhYnN0cmFjdHxlbnwwfHx8fDE3NzYzMDg3MzR8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract agency/police patch for top left navbar or sidebar header to add official forensic context. Mask as a circle or subtle square."
+      }
+    }
+  },
+  "instructions_to_main_agent": [
+    "CRITICAL: Write all code using JavaScript (.js or .jsx). Do not use TypeScript (.ts or .tsx).",
+    "This is a forensic intelligence analysis dashboard. It MUST NOT look like a playful or generic SaaS. Prioritize grid density and technical accuracy.",
+    "Strictly follow the color palette. Backgrounds are #090A0C, cards are #13151A. Borders are #2D333B.",
+    "Use Chivo for headings and IBM Plex Mono for ALL data points (IPs, numbers, metrics, dates, risk scores).",
+    "For the Network Graph, attempt to use react-force-graph-2d. If that fails or is too complex, mock a dense node network with D3 or custom SVG.",
+    "Use the Control Room Grid. Widgets must span logically and stretch vertically to fill their rows without jagged bottoms.",
+    "Add `data-testid` attributes to ALL interactive and informational elements (buttons, inputs, sidebar links, graph nodes, tables, risk scores). Use kebab-case."
+  ]
+}

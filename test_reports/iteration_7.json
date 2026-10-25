@@ -1,0 +1,71 @@
+{
+  "iteration_label": "Amber_2_CompareCases",
+  "summary": "Tested cross-case comparison feature end-to-end. Built 21 pytest cases in /app/backend/tests/test_amber2_compare.py covering POST /api/compare validation, response shape, normalization, DOCX/PDF download, persistence. All 21 backend tests PASSED. Amber_1 regression suite (24 tests) re-ran and PASSED. Frontend tested via Playwright on /compare route: nav link, picker, run-comparison gating, results tabs (phones/imeis/imsis/ips/aliases), alias badges, and PDF+DOCX downloads — all working. Existing /cases/:caseId page also regressed clean.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_results": {
+    "backend": {
+      "total": 21,
+      "passed": 21,
+      "failed": 0,
+      "details": [
+        "TestCompareValidation (4/4): <2 -> 400, empty -> 400, >20 -> 400, non-existent case -> 200 with missing list",
+        "TestCompareResponseShape (7/7): top-level keys, both cases in metadata, key_findings non-empty, shared_phones >=5 incl 9541476474+9906123456, shared_imeis >=2 incl 356938035643809, shared_ips includes 149.154.167.50, aliases for Safvi+Chakan are EXACT similarity=1.0",
+        "TestNormalization (2/2): no 12-digit 91-prefixed phones, IMEIs 14+ digit numerics",
+        "TestReportDownload (5/5): DOCX is PK zip with all section titles, PDF starts %PDF, invalid format -> 400, non-existent compare id -> 404, redownload works",
+        "TestAmber1Regression (3/3): GET /api/cases works, analysis for case A intact, existing per-case PDF still downloads"
+      ]
+    },
+    "amber1_regression_rerun": {
+      "total": 24,
+      "passed": 24,
+      "failed": 0
+    },
+    "frontend_playwright": {
+      "nav_compare_link_present": true,
+      "sidebar_highlighted_on_compare_route": true,
+      "case_picker_only_analyzed_cases": true,
+      "case_select_testids_present_for_test_cases": true,
+      "run_button_disabled_when_zero": true,
+      "run_button_disabled_when_one": true,
+      "run_button_enabled_when_two": true,
+      "summary_cards_correct": "Cases=2, Phones=5, IMEIs=2, IMSIs=0, IPs=1, Aliases=2",
+      "tabs_present": ["compare-tab-phones", "compare-tab-imeis", "compare-tab-imsis", "compare-tab-ips", "compare-tab-aliases"],
+      "rows_per_tab": {"phones": 5, "imeis": 2, "imsis": 0, "ips": 1, "aliases": 2},
+      "alias_rows_show_EXACT_safvi_chakan_similarity_1": true,
+      "download_pdf_filename": "Cross_Case_Comparison.pdf",
+      "download_docx_filename": "Cross_Case_Comparison.docx"
+    }
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_amber2_compare.py",
+    "/app/test_reports/pytest/amber2_results.xml",
+    "/app/backend/tests/test_amber1_modules.py"
+  ],
+  "critical_code_review_comments": [
+    "compare_engine.py is well-structured (370 lines), pure-functional helpers for normalization; good separation. No issues.",
+    "compare_report_generator.py uses bounded caps (_CAP_SHARED_ENTITIES=100, _CAP_ALIASES=50) — good for memory safety.",
+    "server.py compare endpoints correctly use StreamingResponse with Content-Length header and asyncio.to_thread for blocking PDF/DOCX generation — no event-loop blocking.",
+    "MongoDB queries properly exclude _id via projection ({\"_id\": 0}).",
+    "Pydantic CompareRequest validates basic shape; case_ids list type is permissive (any items). Consider tightening to List[str] for stricter typing, but not blocking.",
+    "Cleanup of generated /reports/compare_*.pdf|docx files on disk is not implemented — over time these accumulate. Minor; not regression-blocking.",
+    "find_alias_matches is O(N^2) over all subject pairs across all cases — fine for <=20 cases but worth noting if user later increases the cap.",
+    "Existing pre-existing lint warnings in analysis_engine.py noted per main agent — NOT a regression and out of scope."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_amber2_compare.py (new)"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "No auth required for this app (SIGINT internal tool, no login flow).",
+  "seed_data_creation": "Used existing analyzed cases (7c958508... Geospatial Test and 77aa1a27... Volume+IMSI+Cell Test v2) per main agent's provided IDs. No new data seeded.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Compare feature stable. Backend pytest suite at test_amber2_compare.py covers full happy path + edge cases and runs in <2s. Re-run both amber1 + amber2 for regression on future iterations. The case IDs 7c958508-619b-42ce-bfd0-fc828415309b and 77aa1a27-6e0e-4ba4-b84c-ebbfb3bbe669 are the canonical analyzed test pair sharing Safvi/Chakan/IMEIs/phones."
+}
