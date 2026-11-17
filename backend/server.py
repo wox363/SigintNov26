@@ -6,6 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 import asyncio
+import re
 from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
@@ -21,6 +22,7 @@ from validators import validate_records
 from whatsapp_parser import parse_zip as whatsapp_parse_zip, to_dict as whatsapp_to_dict
 from whatsapp_engine import analyze as whatsapp_analyze
 from briefing_deck import build_briefing_deck
+import audit_log
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -151,13 +153,35 @@ async def create_case(case: CaseCreate):
     }
     await db.cases.insert_one(doc)
     doc.pop("_id", None)
+    await audit_log.record(db, "CASE_CREATED", case_id=case_id, details={"name": case.name})
     return doc
 
 
 @api_router.get("/cases")
-async def list_cases():
-    cases = await db.cases.find({}, {"_id": 0}).to_list(100)
-    return cases
+async def list_cases(skip: int = 0, limit: int = 200, q: Optional[str] = None):
+    """List cases, newest first. Supports pagination.
+
+    Query params:
+      - skip  : offset (default 0)
+      - limit : page size, 1..1000 (default 200)
+      - q     : optional case-insensitive substring match on case name
+
+    Response: { total, skip, limit, cases: [...] }
+    """
+    limit = max(1, min(int(limit or 200), 1000))
+    skip = max(0, int(skip or 0))
+    mongo_q: dict = {}
+    if q:
+        mongo_q["name"] = {"$regex": re.escape(q), "$options": "i"}
+    total = await db.cases.count_documents(mongo_q)
+    cursor = (
+        db.cases.find(mongo_q, {"_id": 0})
+        .sort("created_at", -1)
+        .skip(skip)
+        .limit(limit)
+    )
+    cases = await cursor.to_list(limit)
+    return {"total": total, "skip": skip, "limit": limit, "cases": cases}
 
 
 @api_router.get("/cases/{case_id}")
@@ -176,6 +200,7 @@ async def delete_case(case_id: str):
     await db.uploads.delete_many({"case_id": case_id})
     await db.records.delete_many({"case_id": case_id})
     await db.analyses.delete_many({"case_id": case_id})
+    await audit_log.record(db, "CASE_DELETED", case_id=case_id)
     return {"message": "Case deleted"}
 
 
@@ -266,7 +291,6 @@ async def upload_file_endpoint(
             "is_deleted": False,
         }
         await db.uploads.insert_one(upload_doc)
-
         if records:
             record_docs = [{
                 "id": str(uuid.uuid4()), "case_id": case_id, "upload_id": upload_id,
@@ -277,6 +301,11 @@ async def upload_file_endpoint(
         await _recompute_case_counts(case_id)
         await _mark_needs_reanalysis(case_id, reason="new upload")
         upload_doc.pop("_id", None)
+        await audit_log.record(
+            db, "UPLOAD_CREATED", case_id=case_id, target=upload_id,
+            details={"filename": file.filename, "data_type": data_type,
+                     "records": len(records) if records else 0},
+        )
         return {
             "upload": upload_doc, "records_parsed": len(records),
             "sample_columns": list(records[0].keys()) if records else [],
@@ -321,7 +350,12 @@ async def _mark_needs_reanalysis(case_id: str, reason: str = ""):
 async def list_uploads(case_id: str):
     # Exclude permanently-purged items, but include soft-deleted (within 3-min window)
     # so the UI can show the strike-through + undo state.
-    uploads = await db.uploads.find({"case_id": case_id}, {"_id": 0}).to_list(500)
+    # Ceiling at 10,000 — well above any realistic per-case upload count.
+    uploads = await (
+        db.uploads.find({"case_id": case_id}, {"_id": 0})
+        .sort("uploaded_at", -1)
+        .to_list(10000)
+    )
     return uploads
 
 
@@ -352,6 +386,7 @@ async def soft_delete_upload(case_id: str, upload_id: str):
     )
     await _recompute_case_counts(case_id)
     await _mark_needs_reanalysis(case_id, reason="upload deleted")
+    await audit_log.record(db, "UPLOAD_SOFT_DELETED", case_id=case_id, target=upload_id)
     return {
         "message": "Upload soft-deleted",
         "upload_id": upload_id,
@@ -401,6 +436,7 @@ async def undo_upload_deletion(case_id: str, upload_id: str):
     # (which clears it) or it stays as a non-disruptive reminder.
     # However, if no other unanalyzed changes exist, we can clear it.
     await _maybe_clear_reanalysis_flag(case_id)
+    await audit_log.record(db, "UPLOAD_UNDO_RESTORED", case_id=case_id, target=upload_id)
     return {"message": "Upload restored", "upload_id": upload_id}
 
 
@@ -500,6 +536,10 @@ async def reupload_file(
         await _recompute_case_counts(case_id)
         await _mark_needs_reanalysis(case_id, reason="upload replaced")
         new_doc.pop("_id", None)
+        await audit_log.record(
+            db, "UPLOAD_REPLACED", case_id=case_id, target=new_upload_id,
+            details={"replaced_upload_id": upload_id, "filename": file.filename},
+        )
         return {
             "message": "File replaced. Original kept for undo for 3 minutes.",
             "new_upload": new_doc,
@@ -621,7 +661,12 @@ async def get_evidence(case_id: str, subject: Optional[str] = None, category: Op
         query["category"] = category
     if platform:
         query["platform"] = platform
-    evidence = await db.evidence.find(query, {"_id": 0}).to_list(500)
+    # Ceiling at 10,000 — covers any realistic per-case evidence volume.
+    evidence = await (
+        db.evidence.find(query, {"_id": 0})
+        .sort("timestamp", -1)
+        .to_list(10000)
+    )
     return evidence
 
 
@@ -653,6 +698,10 @@ async def download_report(case_id: str, fmt: str):
         await asyncio.to_thread(generate_pdf_report, case, analysis["data"], str(report_path))
     else:
         await asyncio.to_thread(generate_docx_report, case, analysis["data"], str(report_path))
+
+    await audit_log.record(
+        db, "CASE_REPORT_DOWNLOADED", case_id=case_id, details={"format": fmt},
+    )
 
     media = "application/pdf" if fmt == "pdf" else "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     filename = f"{case['name']}_Report.{fmt}"
@@ -700,6 +749,10 @@ async def run_compare(req: CompareRequest):
         }},
         upsert=True,
     )
+    await audit_log.record(
+        db, "COMPARE_RUN", target=compare_id,
+        details={"case_ids": req.case_ids, "n_cases": len(req.case_ids)},
+    )
     return {"id": compare_id, **comparison}
 
 
@@ -729,6 +782,9 @@ async def download_compare_report(compare_id: str, fmt: str):
                 yield chunk
 
     file_size = os.path.getsize(report_path)
+    await audit_log.record(
+        db, "COMPARE_REPORT_DOWNLOADED", target=compare_id, details={"format": fmt},
+    )
     return StreamingResponse(
         _file_iter(str(report_path)),
         media_type=media,
@@ -815,6 +871,12 @@ async def whatsapp_upload(case_id: str, file: UploadFile = File(...)):
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
     upload_doc.pop("_id", None)
+    await audit_log.record(
+        db, "WA_UPLOAD_CREATED", case_id=case_id, target=upload_id,
+        details={"filename": file.filename,
+                 "messages": len(parsed_dict.get("messages", [])),
+                 "attachments": len(parsed_dict.get("attachments", []))},
+    )
     return {"upload": upload_doc, "analysis_summary": analysis.get("overview", {}),
             "indicators": analysis.get("indicators", []),
             "subject_links": analysis.get("subject_links", {})}
@@ -822,7 +884,11 @@ async def whatsapp_upload(case_id: str, file: UploadFile = File(...)):
 
 @api_router.get("/cases/{case_id}/whatsapp/uploads")
 async def whatsapp_list_uploads(case_id: str):
-    uploads = await db.whatsapp_uploads.find({"case_id": case_id}, {"_id": 0}).to_list(200)
+    uploads = await (
+        db.whatsapp_uploads.find({"case_id": case_id}, {"_id": 0})
+        .sort("uploaded_at", -1)
+        .to_list(10000)
+    )
     return uploads
 
 
@@ -902,6 +968,7 @@ async def whatsapp_soft_delete(case_id: str, upload_id: str):
         {"$set": {"is_deleted": True, "deleted_at": now.isoformat(),
                   "deletion_expires_at": expires_at, "deletion_reason": "user_delete"}}
     )
+    await audit_log.record(db, "WA_UPLOAD_SOFT_DELETED", case_id=case_id, target=upload_id)
     return {"message": "Upload soft-deleted",
             "upload_id": upload_id,
             "deletion_expires_at": expires_at,
@@ -1019,11 +1086,36 @@ async def download_briefing_deck():
         logger.exception("Briefing deck generation failed")
         raise HTTPException(status_code=500, detail=f"Failed to generate deck: {e}")
     filename = f"AMBER_Briefing_{datetime.now(timezone.utc).strftime('%Y%m%d')}.pptx"
+    await audit_log.record(db, "BRIEFING_DECK_DOWNLOADED", target=filename)
     return StreamingResponse(
         iter([data]),
         media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@api_router.get("/audit")
+async def list_audit(case_id: Optional[str] = None,
+                     action: Optional[str] = None,
+                     operator: Optional[str] = None,
+                     limit: int = 200):
+    """Return the most-recent audit entries, newest first.
+
+    Filters (all optional):
+      - case_id : scope to one case
+      - action  : e.g. 'UPLOAD_SOFT_DELETED'
+      - operator: Windows username
+      - limit   : max rows (1..1000, default 200)
+
+    This endpoint is READ-ONLY. There is no delete-audit endpoint by design.
+    """
+    limit = max(1, min(int(limit or 200), 1000))
+    q: dict = {}
+    if case_id: q["case_id"] = case_id
+    if action: q["action"] = action
+    if operator: q["operator"] = operator
+    rows = await db.audit.find(q, {"_id": 0}).sort("ts", -1).to_list(limit)
+    return {"count": len(rows), "entries": rows}
 
 
 app.include_router(api_router)
@@ -1101,6 +1193,7 @@ async def create_indexes():
     await db.uploads.create_index([("case_id", 1)])
     await db.uploads.create_index([("deletion_expires_at", 1)])
     await db.cases.create_index([("id", 1)], unique=True)
+    await audit_log.ensure_indexes(db)
     logger.info("MongoDB indexes created")
     # Kick off background purge task for expired soft-deletes
     asyncio.create_task(_undo_window_purger())

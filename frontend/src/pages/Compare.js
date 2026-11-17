@@ -29,8 +29,9 @@ export default function Compare() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get(`${API}/cases`);
-        setCases(res.data.filter((c) => c.status === "analyzed"));
+        const res = await axios.get(`${API}/cases?limit=1000`);
+        const all = Array.isArray(res.data) ? res.data : (res.data.cases || []);
+        setCases(all.filter((c) => c.status === "analyzed"));
       } catch (e) {
         toast.error("Failed to load cases");
       }

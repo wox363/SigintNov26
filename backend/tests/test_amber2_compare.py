@@ -167,7 +167,13 @@ class TestAmber1Regression:
         r = session.get(f"{API}/cases", timeout=30)
         assert r.status_code == 200
         data = r.json()
-        assert isinstance(data, list)
+        # After Nov-2026 pagination change, /cases returns a wrapped envelope.
+        # Accept both shapes so this regression test stays honest about the API.
+        if isinstance(data, dict):
+            assert "cases" in data and isinstance(data["cases"], list)
+            assert "total" in data
+        else:
+            assert isinstance(data, list)
 
     def test_get_analysis_for_case_a(self, session):
         r = session.get(f"{API}/cases/{CASE_A}/analysis", timeout=30)

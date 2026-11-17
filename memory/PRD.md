@@ -94,8 +94,12 @@ Design and develop a software system that ingests IPDR, CDR datasets and WhatsAp
 - 🟢 **Global security headers** middleware added (`server.py`): strict CSP (no external origins), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy` locks down camera/mic/geo/payment/usb.
 - 🟢 **FastAPI `/docs`, `/redoc`, `/openapi.json` disabled** by default. Operators who need them set `AMBER_EXPOSE_DOCS=1` env var.
 - 🟢 **ZIP-bomb protection** in `whatsapp_parser.py`: per-entry 200x decompression ratio cap + 2 GB total decompressed cap.
+- 🟢 **Evidence writes routed through `_persist_evidence_locally()`** with offline-by-design docstring.
+- 🟢 **Dependency prune** (Nov 2026): removed stripe, openai, litellm, boto3, google-genai, google-auth, google-generativeai, botocore, PyJWT, python-jose, passlib, bcrypt, emergentintegrations (13 heavy unused packages). requirements.txt 145 → 139 lines.
+- 🟢 **Audit log** (`audit_log.py`): append-only `db.audit` collection, writes operator (Windows USERNAME), host, action, target. Wired into 10 mutating routes (case/upload CRUD, compare, reports, briefing). `GET /api/audit` with case_id/action/operator/limit filters.
+- 🟢 **Pagination** (`GET /api/cases`): new envelope `{total, skip, limit, cases}` + `?q=` substring filter. Per-case endpoints (uploads/evidence/WA-uploads) have ceilings raised 500→10,000 with explicit newest-first sort. Frontend updated with forward-compatible parsing.
 - 🟢 **`pytest.ini`** added to pin asyncio mode.
-- 118/118 tests passing after all hardening changes.
+- **118/118 tests passing** after all hardening changes.
 
 ### Known preview-only artefact (ignore on Windows install)
 - Preview environment's Cloudflare edge injects `fonts.googleapis.com` + `static.cloudflareinsights.com` tags that are **NOT in our code**. Confirmed by curl'ing the dev server directly. Windows install serves `frontend_dist/` via FastAPI which does not inject anything; CSP would block them at the browser even if they appeared.

@@ -33,8 +33,9 @@ export default function Dashboard() {
 
   const fetchCases = async () => {
     try {
-      const res = await axios.get(`${API}/cases`);
-      setCases(res.data);
+      const res = await axios.get(`${API}/cases?limit=1000`);
+      // Response shape: { total, skip, limit, cases }. Fall back to array for older servers.
+      setCases(Array.isArray(res.data) ? res.data : (res.data.cases || []));
     } catch (e) {
       toast.error("Failed to load cases");
     } finally {
