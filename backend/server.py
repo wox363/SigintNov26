@@ -41,7 +41,14 @@ WHATSAPP_DATA_DIR.mkdir(exist_ok=True)
 MAX_UPLOAD_MB = int(os.environ.get("MAX_UPLOAD_MB", "50"))
 MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024
 
-app = FastAPI()
+app = FastAPI(
+    title="AMBER SIGINT Backend",
+    # Disable OpenAPI docs by default on an offline deployment. Operators who
+    # want them can re-enable via env (AMBER_EXPOSE_DOCS=1).
+    docs_url="/docs" if os.environ.get("AMBER_EXPOSE_DOCS") == "1" else None,
+    redoc_url="/redoc" if os.environ.get("AMBER_EXPOSE_DOCS") == "1" else None,
+    openapi_url="/openapi.json" if os.environ.get("AMBER_EXPOSE_DOCS") == "1" else None,
+)
 api_router = APIRouter(prefix="/api")
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -86,6 +93,24 @@ async def _read_upload_with_limit(file: UploadFile) -> bytes:
             )
         chunks.append(chunk)
     return b"".join(chunks)
+
+
+def _persist_evidence_locally(destination: Path, payload: bytes) -> None:
+    """Persist uploaded forensic evidence to the operator's LOCAL DISK.
+
+    AMBER is an **offline, air-gapped Windows deployment**. Classified CDR /
+    IPDR / WhatsApp data is never, by design, sent to cloud object storage —
+    doing so would violate the product's no-cloud guarantee and defeat the
+    entire threat model. All writes land under the operator's chosen Data
+    Folder (default C:\\AMBER-Data) which the agency backs up via mongodump
+    + xcopy, as documented in BACKUP-amber.bat and AGENCY_IT_GUIDE.md.
+    """
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    fd = os.open(str(destination), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        os.write(fd, payload)
+    finally:
+        os.close(fd)
 
 
 @api_router.get("/health")
@@ -206,8 +231,7 @@ async def upload_file_endpoint(
     temp_path = UPLOAD_DIR / f"{upload_id}{file_ext}"
 
     content = await _read_upload_with_limit(file)
-    with open(temp_path, "wb") as f:
-        f.write(content)
+    _persist_evidence_locally(temp_path, content)
 
     try:
         records = parse_file(str(temp_path), file_ext, data_type, password if password else None)
@@ -428,8 +452,7 @@ async def reupload_file(
     file_ext = Path(file.filename).suffix.lower()
     temp_path = UPLOAD_DIR / f"{new_upload_id}{file_ext}"
     content = await _read_upload_with_limit(file)
-    with open(temp_path, "wb") as f:
-        f.write(content)
+    _persist_evidence_locally(temp_path, content)
 
     try:
         records = parse_file(str(temp_path), file_ext, data_type, password if password else None)
@@ -750,10 +773,9 @@ async def whatsapp_upload(case_id: str, file: UploadFile = File(...)):
     if ext not in (".zip", ".txt"):
         raise HTTPException(status_code=400, detail="Only .zip or .txt WhatsApp exports are supported")
 
-    saved_path = upload_dir / ("source" + ext)
+    saved_path = upload_dir / f"{upload_id}{ext}"
     content = await _read_upload_with_limit(file)
-    with open(saved_path, "wb") as f:
-        f.write(content)
+    _persist_evidence_locally(saved_path, content)
 
     try:
         if ext == ".zip":
@@ -926,10 +948,9 @@ async def whatsapp_reupload(case_id: str, upload_id: str, file: UploadFile = Fil
     if ext not in (".zip", ".txt"):
         raise HTTPException(status_code=400, detail="Only .zip or .txt accepted")
 
-    saved_path = upload_dir / ("source" + ext)
+    saved_path = upload_dir / f"{new_upload_id}{ext}"
     content = await _read_upload_with_limit(file)
-    with open(saved_path, "wb") as f:
-        f.write(content)
+    _persist_evidence_locally(saved_path, content)
     try:
         if ext == ".zip":
             parsed = whatsapp_parse_zip(str(saved_path), extract_attachments_to=str(attachments_dir))
@@ -1033,6 +1054,44 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# -----------------------------------------------------------------------------
+# Global security headers.
+# These apply to every response — static UI pages AND API JSON alike.
+# Tailored for an air-gapped offline deployment: no external resources are
+# permitted. If the operator chooses to enable FastAPI /docs, the Swagger UI
+# needs 'unsafe-inline' for its own styles, so CSP is kept pragmatic.
+# -----------------------------------------------------------------------------
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Permissions-Policy"] = (
+            "geolocation=(), camera=(), microphone=(), "
+            "payment=(), usb=(), fullscreen=(self)"
+        )
+        # CSP: self + inline/eval (needed by CRA bundle and leaflet).
+        # Explicitly NO external origins — classified data cannot leak via
+        # a stray <img>/font/analytics tag.
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: blob:; "
+            "font-src 'self' data:; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'"
+        )
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 
 @app.on_event("startup")

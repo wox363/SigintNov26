@@ -370,6 +370,14 @@ def parse_zip(zip_path: str, extract_attachments_to: Optional[str] = None) -> Pa
         if attachment_extract_dir:
             attachment_extract_dir.mkdir(parents=True, exist_ok=True)
 
+        # ZIP-bomb protection: cap total decompressed bytes and per-entry
+        # expansion ratio. A 10 MB ZIP that expands to 20 GB is a resource
+        # exhaustion attack. These limits are generous for real WhatsApp
+        # exports (which typically expand <5x and total <500 MB).
+        MAX_TOTAL_DECOMPRESSED = 2 * 1024 * 1024 * 1024   # 2 GB total
+        MAX_ENTRY_RATIO = 200                              # compressed→decompressed ratio per file
+        decompressed_so_far = 0
+
         for name in names:
             if name == chat_filename:
                 continue
@@ -382,11 +390,28 @@ def parse_zip(zip_path: str, extract_attachments_to: Optional[str] = None) -> Pa
                     or base in (".DS_Store", "Thumbs.db", "desktop.ini")
                     or base.startswith("._")):
                 continue
+
+            # Pre-check declared uncompressed size against the ratio and total cap.
+            info = zf.getinfo(name)
+            if info.compress_size > 0 and info.file_size / info.compress_size > MAX_ENTRY_RATIO:
+                warnings.append(
+                    f"Skipped {name}: decompression ratio "
+                    f"{info.file_size // max(info.compress_size,1)}x exceeds safety cap"
+                )
+                continue
+            if decompressed_so_far + info.file_size > MAX_TOTAL_DECOMPRESSED:
+                warnings.append(
+                    f"Skipped {name}: total decompressed size would exceed "
+                    f"{MAX_TOTAL_DECOMPRESSED // (1024*1024)} MB cap"
+                )
+                continue
+
             try:
                 data = zf.read(name)
             except Exception as e:
                 warnings.append(f"Could not read attachment {name}: {e}")
                 continue
+            decompressed_so_far += len(data)
             sha = hashlib.sha256(data).hexdigest()
             mime = _mime_hint(name)
             att = Attachment(

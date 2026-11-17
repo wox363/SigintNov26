@@ -89,13 +89,16 @@ Design and develop a software system that ingests IPDR, CDR datasets and WhatsAp
 - 🟢 `REACT_APP_BACKEND_URL` baked to preview → installer overrides to `http://127.0.0.1:8001`
 - 🟢 FastAPI couldn't serve static React → `frontend_dist/` mount added
 
-### Tier-1 hardening (closed Feb 2026)
-- 🟢 CORS locked to localhost (`http://127.0.0.1:8001`, `http://localhost:8001`, dev ports)
-- 🟢 WhatsApp attachment serving — forced `Content-Disposition: attachment` + `X-Content-Type-Options: nosniff` + safe MIME allowlist
-- 🟢 WhatsApp ZIP cruft filter — `__MACOSX/`, `.DS_Store`, `Thumbs.db`, `desktop.ini`, `._*`
-- 🟢 Relationship graph reshaped — hub-and-spoke instead of misleading all-to-all
-- 🟢 `add_subject` / `remove_subject` now mark case as `needs_reanalysis`
-- 🟢 13 new pytest cases (`test_amber6_tier1.py`) — 118/118 passing
+### Pre-Launch Security Audit — closed Nov 2026
+- 🟢 **SEC-001 (P1) fixed**: Removed PostHog session-recording, `assets.emergent.sh/emergent-main.js`, and Google Fonts CDN from `frontend/public/index.html`. Verified served HTML is clean. Prevents classified data leaking via session replay if the air-gap ever fails.
+- 🟢 **Global security headers** middleware added (`server.py`): strict CSP (no external origins), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy` locks down camera/mic/geo/payment/usb.
+- 🟢 **FastAPI `/docs`, `/redoc`, `/openapi.json` disabled** by default. Operators who need them set `AMBER_EXPOSE_DOCS=1` env var.
+- 🟢 **ZIP-bomb protection** in `whatsapp_parser.py`: per-entry 200x decompression ratio cap + 2 GB total decompressed cap.
+- 🟢 **`pytest.ini`** added to pin asyncio mode.
+- 118/118 tests passing after all hardening changes.
+
+### Known preview-only artefact (ignore on Windows install)
+- Preview environment's Cloudflare edge injects `fonts.googleapis.com` + `static.cloudflareinsights.com` tags that are **NOT in our code**. Confirmed by curl'ing the dev server directly. Windows install serves `frontend_dist/` via FastAPI which does not inject anything; CSP would block them at the browser even if they appeared.
 
 ### Still open (P1 — Tier 2)
 - 100/500 silent `to_list` truncations on cases/uploads/evidence
