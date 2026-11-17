@@ -94,30 +94,28 @@ export default function Dashboard() {
 
   return (
     <div data-testid="dashboard-page" className="p-6 animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-start justify-between mb-6">
         <div>
           <h1 data-testid="dashboard-title" className="text-3xl font-bold text-[#E1E7EF] font-chivo tracking-tight">
             Intelligence Dashboard
           </h1>
           <p className="text-sm text-[#6E7681] mt-1">CDR & IPDR Analysis Control Center</p>
+          <Button
+            data-testid="briefing-deck-btn"
+            onClick={downloadBriefingDeck}
+            variant="outline"
+            className="mt-3 border-[#C8A951] text-[#C8A951] hover:bg-[#C8A951]/10 rounded-sm text-sm"
+            title="Download senior-officer briefing deck (.pptx)"
+          >
+            <Presentation className="w-4 h-4 mr-1" /> Briefing Deck
+          </Button>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <div className="flex items-center gap-2">
-            <Button
-              data-testid="briefing-deck-btn"
-              onClick={downloadBriefingDeck}
-              variant="outline"
-              className="border-[#C8A951] text-[#C8A951] hover:bg-[#C8A951]/10 rounded-sm text-sm"
-              title="Download senior-officer briefing deck (.pptx)"
-            >
-              <Presentation className="w-4 h-4 mr-1" /> Briefing Deck
+          <DialogTrigger asChild>
+            <Button data-testid="create-case-btn" className="bg-[#0047FF] hover:bg-[#003BD6] text-white rounded-sm text-sm">
+              <Plus className="w-4 h-4 mr-1" /> New Case
             </Button>
-            <DialogTrigger asChild>
-              <Button data-testid="create-case-btn" className="bg-[#0047FF] hover:bg-[#003BD6] text-white rounded-sm text-sm">
-                <Plus className="w-4 h-4 mr-1" /> New Case
-              </Button>
-            </DialogTrigger>
-          </div>
+          </DialogTrigger>
           <DialogContent className="bg-[#13151A] border-[#2D333B]">
             <DialogHeader>
               <DialogTitle className="text-[#E1E7EF] font-chivo">Create New Case</DialogTitle>
